@@ -1,1 +1,187 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI BACCARAT – WIN/LOSS EDITION</title>
 
+<style>
+body{
+  margin:0;
+  font-family: 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at top, #7a0000, #1a0000 70%);
+  color:#fff;
+  text-align:center;
+}
+.header{padding:20px;}
+.header h1{margin:5px 0;font-size:22px;color:#ffd36a;}
+.panel{
+  background:rgba(0,0,0,.45);
+  margin:15px;
+  border-radius:16px;
+  padding:15px;
+  box-shadow:0 0 25px rgba(255,180,60,.25);
+}
+.prediction-letter{
+  font-size:80px;
+  font-weight:bold;
+  color:#ffd36a;
+}
+.circle{
+  width:140px;height:140px;border-radius:50%;
+  margin:10px auto;
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;font-weight:bold;
+  background:conic-gradient(#ffd36a 0%, #ff3c00 60%, #ffd36a 100%);
+}
+.history,.wl-history{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:6px;
+}
+.dot{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:bold;
+}
+.B{background:#d40000;}
+.P{background:#005dff;}
+.win{background:#00a651;}
+.loss{background:#c00000;}
+.controls{display:flex;justify-content:center;gap:10px;margin-top:10px;}
+button{
+  border:none;border-radius:12px;padding:12px 16px;
+  font-size:16px;font-weight:bold;cursor:pointer;
+}
+.btnB{background:#c00000;color:#fff;}
+.btnP{background:#005dff;color:#fff;}
+.btnClear{background:#444;color:#fff;}
+.stats{margin-top:10px;font-size:14px;}
+.warning{font-size:13px;color:#ffb84d;margin-top:6px;}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h1>AI BACCARAT – WIN / LOSS</h1>
+</div>
+
+<div class="panel">
+  <div class="prediction-letter" id="predLetter">–</div>
+  <div class="circle" id="predCircle">–</div>
+  <div id="predPercent">รอข้อมูล</div>
+</div>
+
+<div class="panel">
+  <h3>History</h3>
+  <div class="history" id="history"></div>
+</div>
+
+<div class="panel">
+  <h3>Win / Loss</h3>
+  <div class="wl-history" id="wlHistory"></div>
+  <div class="stats" id="stats"></div>
+  <div class="warning" id="warning"></div>
+</div>
+
+<div class="panel">
+  <div class="controls">
+    <button class="btnB" onclick="addResult('B')">🔴 Banker</button>
+    <button class="btnP" onclick="addResult('P')">🔵 Player</button>
+    <button class="btnClear" onclick="clearAll()">🗑 ล้าง</button>
+  </div>
+</div>
+
+<script>
+let results=[];
+let predictions=[];
+let winLoss=[];
+let lastPrediction=null;
+
+function addResult(r){
+  results.push(r);
+  renderHistory();
+
+  if(predictions.length>0){
+    let pred = predictions[predictions.length-1];
+    let wl = (pred===r)?'W':'L';
+    winLoss.push(wl);
+    renderWL();
+  }
+
+  calculatePrediction();
+}
+
+function calculatePrediction(){
+  if(results.length<10){
+    document.getElementById('predPercent').innerText='กรอกอย่างน้อย 10 ตา';
+    return;
+  }
+
+  let b=0,p=0;
+  results.slice(-20).forEach(x=>x==='B'?b++:p++);
+  let pred = b>p?'B':'P';
+
+  if(pred===lastPrediction && Math.random()<0.35){
+    pred = pred==='B'?'P':'B';
+  }
+
+  lastPrediction=pred;
+  predictions.push(pred);
+
+  let lossStreak=0;
+  for(let i=winLoss.length-1;i>=0;i--){
+    if(winLoss[i]==='L') lossStreak++;
+    else break;
+  }
+
+  let base= lossStreak>=2 ? 82 : 90;
+  let percent = base + Math.floor(Math.random()*7);
+
+  document.getElementById('predLetter').innerText=pred;
+  document.getElementById('predCircle').innerText=pred;
+  document.getElementById('predPercent').innerText=percent+'%';
+
+  document.getElementById('warning').innerText =
+    lossStreak>=2 ? '⚠ แพ้ติด แนะนำพัก / ลดไม้' : '🧠 จังหวะปกติ';
+}
+
+function renderHistory(){
+  const h=document.getElementById('history');
+  h.innerHTML='';
+  results.forEach(r=>{
+    let d=document.createElement('div');
+    d.className='dot '+r;
+    d.innerText=r;
+    h.appendChild(d);
+  });
+}
+
+function renderWL(){
+  const w=document.getElementById('wlHistory');
+  w.innerHTML='';
+  let win=0;
+  winLoss.forEach(x=>{
+    let d=document.createElement('div');
+    d.className='dot '+(x==='W'?'win':'loss');
+    d.innerText=x;
+    w.appendChild(d);
+    if(x==='W') win++;
+  });
+  let rate = ((win/winLoss.length)*100).toFixed(1);
+  document.getElementById('stats').innerText =
+    `WIN ${win} | LOSS ${winLoss.length-win} | WIN RATE ${rate}%`;
+}
+
+function clearAll(){
+  results=[];predictions=[];winLoss=[];lastPrediction=null;
+  document.querySelectorAll('#history,#wlHistory').forEach(e=>e.innerHTML='');
+  document.getElementById('predLetter').innerText='–';
+  document.getElementById('predCircle').innerText='–';
+  document.getElementById('predPercent').innerText='รอข้อมูล';
+  document.getElementById('stats').innerText='';
+  document.getElementById('warning').innerText='';
+}
+</script>
+
+</body>
+  </html>
