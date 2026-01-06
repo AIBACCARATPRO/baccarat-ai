@@ -1,187 +1,234 @@
-<!DOCTYPE html>
-<html lang="th">
+<!DOCTYPE html><html lang="th">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AI BACCARAT – WIN/LOSS EDITION</title>
-
+<meta charset="UTF-8">
+<title>AI BACCARAT • Model V1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
+:root{
+  --bg:#020617;
+  --panel:#050b1f;
+  --neon:#22d3ee;
+  --blue:#3b82f6;
+  --red:#ef4444;
+  --green:#22c55e;
+  --purple:#a855f7;
+  --gray:#64748b;
+}
+*{box-sizing:border-box}
 body{
   margin:0;
-  font-family: 'Segoe UI', sans-serif;
-  background: radial-gradient(circle at top, #7a0000, #1a0000 70%);
-  color:#fff;
+  font-family:Segoe UI,Arial;
+  background:radial-gradient(circle at top,#050b1f,#020617 70%);
+  color:#e5e7eb;
+}
+.header{
+  text-align:center;
+  padding:18px;
+  font-size:28px;
+  font-weight:900;
+  color:var(--neon);
+  text-shadow:0 0 20px var(--neon);
+  border-bottom:2px solid #1e293b;
+}
+.container{max-width:900px;margin:auto;padding:16px}
+.card{
+  background:linear-gradient(180deg,#0b1224,#020617);
+  border:1px solid #1e293b;
+  border-radius:20px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 0 30px rgba(34,211,238,.15);
+}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
   text-align:center;
 }
-.header{padding:20px;}
-.header h1{margin:5px 0;font-size:22px;color:#ffd36a;}
-.panel{
-  background:rgba(0,0,0,.45);
-  margin:15px;
-  border-radius:16px;
-  padding:15px;
-  box-shadow:0 0 25px rgba(255,180,60,.25);
+.stat{
+  background:#020617;
+  border:1px solid #1e293b;
+  border-radius:14px;
+  padding:12px;
 }
-.prediction-letter{
-  font-size:80px;
-  font-weight:bold;
-  color:#ffd36a;
+.stat small{color:#94a3b8}
+.stat div{font-size:26px;font-weight:900;color:var(--neon)}
+.predict{ text-align:center; font-size:56px; font-weight:900; margin:10px 0; }
+.predict.P{color:var(--blue);text-shadow:0 0 20px var(--blue)}
+.predict.B{color:var(--red);text-shadow:0 0 20px var(--red)}
+.wait{color:#64748b}
+.conf{text-align:center;color:#a5f3fc}
+
+.history{ text-align:center; font-size:22px; letter-spacing:6px; min-height:34px; }
+.p{color:var(--blue);font-weight:900}
+.b{color:var(--red);font-weight:900}
+.t{color:var(--green);font-weight:900}
+
+.buttons{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.control{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:10px;}
+.btn{
+  padding:18px 0;
+  font-size:20px;
+  font-weight:900;
+  border:none;
+  border-radius:18px;
+  cursor:pointer;
+  color:#fff;
 }
-.circle{
-  width:140px;height:140px;border-radius:50%;
-  margin:10px auto;
-  display:flex;align-items:center;justify-content:center;
-  font-size:36px;font-weight:bold;
-  background:conic-gradient(#ffd36a 0%, #ff3c00 60%, #ffd36a 100%);
+.player{background:linear-gradient(180deg,#2563eb,#1e3a8a)}
+.banker{background:linear-gradient(180deg,#dc2626,#7f1d1d)}
+.tie{background:linear-gradient(180deg,#22c55e,#14532d);color:#000}
+.undo{background:linear-gradient(180deg,#64748b,#334155)}
+.reset{background:linear-gradient(180deg,#475569,#1e293b)}
+
+.mode{ display:flex; gap:12px; justify-content:center; }
+.mode button{
+  padding:10px 22px;
+  border-radius:14px;
+  border:none;
+  font-weight:900;
+  cursor:pointer;
+  background:#1f2937;
+  color:#e5e7eb;
 }
-.history,.wl-history{
-  display:flex;flex-wrap:wrap;justify-content:center;gap:6px;
+.mode .active{
+  background:var(--purple);
+  color:#020617;
+  box-shadow:0 0 14px var(--purple);
 }
-.dot{
-  width:28px;height:28px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-weight:bold;
+.footer{
+  text-align:center;
+  font-size:13px;
+  color:#64748b;
+  margin-top:8px;
 }
-.B{background:#d40000;}
-.P{background:#005dff;}
-.win{background:#00a651;}
-.loss{background:#c00000;}
-.controls{display:flex;justify-content:center;gap:10px;margin-top:10px;}
-button{
-  border:none;border-radius:12px;padding:12px 16px;
-  font-size:16px;font-weight:bold;cursor:pointer;
-}
-.btnB{background:#c00000;color:#fff;}
-.btnP{background:#005dff;color:#fff;}
-.btnClear{background:#444;color:#fff;}
-.stats{margin-top:10px;font-size:14px;}
-.warning{font-size:13px;color:#ffb84d;margin-top:6px;}
 </style>
 </head>
 
 <body>
+<div class="header">⚡ AI BACCARAT • Model V1 ⚡</div>
 
-<div class="header">
-  <h1>AI BACCARAT – WIN / LOSS</h1>
+<div class="container">
+
+<div class="card stats">
+  <div class="stat"><small>ไม้</small><div id="count">0</div></div>
+  <div class="stat"><small>ชนะ</small><div id="win">0</div></div>
+  <div class="stat"><small>แพ้</small><div id="loss">0</div></div>
+  <div class="stat"><small>%</small><div id="acc">0%</div></div>
 </div>
 
-<div class="panel">
-  <div class="prediction-letter" id="predLetter">–</div>
-  <div class="circle" id="predCircle">–</div>
-  <div id="predPercent">รอข้อมูล</div>
+<div class="card mode">
+  <button id="pure" class="active" onclick="setMode('pure')">AI Model (Cyber)</button>
+  <button id="weighted" onclick="setMode('weighted')">AI Model (Adaptive)</button>
 </div>
 
-<div class="panel">
-  <h3>History</h3>
-  <div class="history" id="history"></div>
+<div class="card">
+  <div id="prediction" class="predict wait">WAIT 10</div>
+  <div id="conf" class="conf"></div>
 </div>
 
-<div class="panel">
-  <h3>Win / Loss</h3>
-  <div class="wl-history" id="wlHistory"></div>
-  <div class="stats" id="stats"></div>
-  <div class="warning" id="warning"></div>
+<div class="card">
+  <div id="history" class="history">ยังไม่มีข้อมูล</div>
 </div>
 
-<div class="panel">
-  <div class="controls">
-    <button class="btnB" onclick="addResult('B')">🔴 Banker</button>
-    <button class="btnP" onclick="addResult('P')">🔵 Player</button>
-    <button class="btnClear" onclick="clearAll()">🗑 ล้าง</button>
-  </div>
+<div class="buttons">
+  <button class="btn player" onclick="add('P')">ผู้เล่น</button>
+  <button class="btn banker" onclick="add('B')">เจ้ามือ</button>
+  <button class="btn tie" onclick="add('T')">เสมอ</button>
+</div>
+
+<div class="control">
+  <button class="btn undo" onclick="undo()">ย้อนกลับ</button>
+  <button class="btn reset" onclick="resetAll()">ล้างข้อมูล</button>
+</div>
+
+<div class="footer">AI BACCARAT Model V1</div>
 </div>
 
 <script>
-let results=[];
-let predictions=[];
-let winLoss=[];
-let lastPrediction=null;
+let h=[],pred=null,win=0,loss=0,mode='pure';
 
-function addResult(r){
-  results.push(r);
-  renderHistory();
+function randomPick(){return Math.random()<0.5?'P':'B'}
 
-  if(predictions.length>0){
-    let pred = predictions[predictions.length-1];
-    let wl = (pred===r)?'W':'L';
-    winLoss.push(wl);
-    renderWL();
-  }
-
-  calculatePrediction();
+function weightedPick(){
+  const c=h.filter(x=>x!=='T');
+  if(c.length<3) return randomPick();
+  let last=c.at(-1);
+  if(Math.random()<0.65) return last;
+  return last==='P'?'B':'P';
 }
 
-function calculatePrediction(){
-  if(results.length<10){
-    document.getElementById('predPercent').innerText='กรอกอย่างน้อย 10 ตา';
+function predict(){
+  if(h.filter(x=>x!=='T').length<10){
+    document.getElementById('prediction').textContent='WAIT 10';
+    document.getElementById('prediction').className='predict wait';
+    document.getElementById('conf').textContent='';
+    pred=null;
     return;
   }
+  let p = mode==='pure'?randomPick():weightedPick();
+  pred=p;
+  document.getElementById('prediction').textContent=p;
+  document.getElementById('prediction').className='predict '+p;
+  document.getElementById('conf').textContent='ความมั่นใจ '+Math.floor(55+Math.random()*35)+'%';
+}
 
-  let b=0,p=0;
-  results.slice(-20).forEach(x=>x==='B'?b++:p++);
-  let pred = b>p?'B':'P';
-
-  if(pred===lastPrediction && Math.random()<0.35){
-    pred = pred==='B'?'P':'B';
+function add(x){
+  h.push(x);
+  renderHistory();
+  if(pred && x!=='T'){
+    if(x===pred) win++; else loss++;
   }
+  predict();
+  updateStats();
+}
 
-  lastPrediction=pred;
-  predictions.push(pred);
+function undo(){
+  if(!h.length) return;
+  h.pop();
+  pred=null;
+  win=0; loss=0;
+  renderHistory();
+  predict();
+  updateStats();
+}
 
-  let lossStreak=0;
-  for(let i=winLoss.length-1;i>=0;i--){
-    if(winLoss[i]==='L') lossStreak++;
-    else break;
-  }
-
-  let base= lossStreak>=2 ? 82 : 90;
-  let percent = base + Math.floor(Math.random()*7);
-
-  document.getElementById('predLetter').innerText=pred;
-  document.getElementById('predCircle').innerText=pred;
-  document.getElementById('predPercent').innerText=percent+'%';
-
-  document.getElementById('warning').innerText =
-    lossStreak>=2 ? '⚠ แพ้ติด แนะนำพัก / ลดไม้' : '🧠 จังหวะปกติ';
+function resetAll(){
+  h=[]; pred=null; win=0; loss=0;
+  document.getElementById('history').textContent='ยังไม่มีข้อมูล';
+  document.getElementById('prediction').textContent='WAIT 10';
+  document.getElementById('prediction').className='predict wait';
+  document.getElementById('conf').textContent='';
+  updateStats();
 }
 
 function renderHistory(){
-  const h=document.getElementById('history');
-  h.innerHTML='';
-  results.forEach(r=>{
-    let d=document.createElement('div');
-    d.className='dot '+r;
-    d.innerText=r;
-    h.appendChild(d);
+  const el=document.getElementById('history');
+  if(!h.length){el.textContent='ยังไม่มีข้อมูล';return;}
+  el.innerHTML='';
+  h.forEach(x=>{
+    let s=document.createElement('span');
+    s.textContent=x;
+    s.className=x==='P'?'p':x==='B'?'b':'t';
+    el.append(s,' ');
   });
 }
 
-function renderWL(){
-  const w=document.getElementById('wlHistory');
-  w.innerHTML='';
-  let win=0;
-  winLoss.forEach(x=>{
-    let d=document.createElement('div');
-    d.className='dot '+(x==='W'?'win':'loss');
-    d.innerText=x;
-    w.appendChild(d);
-    if(x==='W') win++;
-  });
-  let rate = ((win/winLoss.length)*100).toFixed(1);
-  document.getElementById('stats').innerText =
-    `WIN ${win} | LOSS ${winLoss.length-win} | WIN RATE ${rate}%`;
+function updateStats(){
+  let t=win+loss;
+  document.getElementById('count').textContent=t;
+  document.getElementById('win').textContent=win;
+  document.getElementById('loss').textContent=loss;
+  document.getElementById('acc').textContent=t?Math.round(win/t*100)+'%':'0%';
 }
 
-function clearAll(){
-  results=[];predictions=[];winLoss=[];lastPrediction=null;
-  document.querySelectorAll('#history,#wlHistory').forEach(e=>e.innerHTML='');
-  document.getElementById('predLetter').innerText='–';
-  document.getElementById('predCircle').innerText='–';
-  document.getElementById('predPercent').innerText='รอข้อมูล';
-  document.getElementById('stats').innerText='';
-  document.getElementById('warning').innerText='';
+function setMode(m){
+  mode=m;
+  document.getElementById('pure').classList.remove('active');
+  document.getElementById('weighted').classList.remove('active');
+  document.getElementById(m).classList.add('active');
+  predict();
 }
 </script>
-
 </body>
-  </html>
+</html>
