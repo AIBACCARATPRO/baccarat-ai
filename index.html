@@ -1,1 +1,258 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI BACCARAT • ULTRA CHAOS DNA</title>
 
+<style>
+body{
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  background:radial-gradient(circle at top,#3a0000,#000 70%);
+  color:#fff;
+}
+.app{max-width:420px;margin:auto;padding:14px}
+
+.header{text-align:center;margin-bottom:10px}
+.header h1{
+  font-size:26px;
+  letter-spacing:2px;
+  color:#ffb703;
+  text-shadow:0 0 25px #ff9f1c;
+}
+
+.panel{
+  background:linear-gradient(180deg,#140000,#040000);
+  border-radius:22px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 0 45px rgba(255,80,80,.35);
+  border:1px solid rgba(255,0,0,.25);
+}
+
+/* PRED */
+.pred{text-align:center}
+.big{
+  font-size:96px;
+  font-weight:900;
+}
+.B{color:#ff2d2d;text-shadow:0 0 30px #ff2d2d}
+.P{color:#3b82f6;text-shadow:0 0 30px #3b82f6}
+.T{color:#22c55e;text-shadow:0 0 30px #22c55e}
+.wait{color:#555}
+
+.conf-text{color:#ffd166;margin-top:-6px}
+
+.bar{
+  height:10px;
+  background:#222;
+  border-radius:10px;
+  overflow:hidden;
+  margin-top:8px;
+}
+.bar-fill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#ffb703,#ff006e);
+  transition:.4s;
+}
+
+/* BUTTONS */
+.buttons{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+}
+button{
+  padding:14px;
+  font-size:16px;
+  font-weight:900;
+  border:none;
+  border-radius:16px;
+}
+button:active{transform:scale(.92)}
+.btnB{background:#8b0000;color:#fff}
+.btnP{background:#003c8f;color:#fff}
+.btnT{background:#065f46;color:#fff}
+.btnU{background:#333;color:#fff}
+.btnC{background:#000;color:#ff6b6b;grid-column:span 2}
+
+/* STATS */
+.stats{display:flex;justify-content:space-around;text-align:center}
+.win{color:#22c55e}
+.loss{color:#ef4444}
+.rate{color:#ffd166}
+
+/* HISTORY */
+.history,.dna{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  justify-content:center;
+}
+.dot{
+  width:30px;height:30px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;
+}
+.dot.B{background:#b91c1c}
+.dot.P{background:#1d4ed8}
+.dot.T{background:#15803d}
+
+/* DNA */
+.dna-item{
+  width:30px;height:30px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;
+}
+.ok{background:#14532d;color:#22c55e}
+.bad{background:#450a0a;color:#ef4444}
+
+.footer{text-align:center;font-size:11px;color:#777}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<div class="header">
+  <h1>AI BACCARAT</h1>
+</div>
+
+<div class="panel pred">
+  <div id="pred" class="big wait">–</div>
+  <div id="confText" class="conf-text">กรอกผลให้ครบ 10 ตา</div>
+  <div class="bar"><div id="confBar" class="bar-fill"></div></div>
+</div>
+
+<div class="panel">
+  <div class="stats">
+    <div class="win">WIN<br><b id="win">0</b></div>
+    <div class="loss">LOSS<br><b id="loss">0</b></div>
+    <div class="rate">WIN %<br><b id="rate">0%</b></div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="buttons">
+    <button class="btnB" onclick="add('B')">🔴 B</button>
+    <button class="btnP" onclick="add('P')">🔵 P</button>
+    <button class="btnT" onclick="add('T')">🟢 T</button>
+    <button class="btnU" onclick="undo()">↩ Undo</button>
+    <button class="btnC" onclick="resetAll()">🗑 ล้างข้อมูล</button>
+  </div>
+</div>
+
+<div class="panel">
+  <b>History</b>
+  <div id="history" class="history" style="margin-top:10px"></div>
+</div>
+
+<div class="panel">
+  <b>DNA (√ / ×)</b>
+  <div id="dna" class="dna" style="margin-top:10px"></div>
+</div>
+
+<div class="footer">ULTRA CHAOS • DNA SYSTEM</div>
+
+</div>
+
+<script>
+let history=[];
+let dna=[];
+let lastPred=null;
+let win=0,loss=0;
+
+function add(v){
+  history.push(v);
+
+  if(history.length>10 && lastPred){
+    if(v===lastPred){
+      win++; dna.push("√");
+    }else{
+      loss++; dna.push("×");
+    }
+  }
+
+  render();
+  predict();
+}
+
+function undo(){
+  if(history.length===0)return;
+  history.pop();
+  if(dna.length>0) dna.pop();
+  lastPred=null;
+  recalcStats();
+  render();
+  resetPredict();
+}
+
+function resetAll(){
+  if(!confirm("ล้างข้อมูลทั้งหมด?"))return;
+  history=[];dna=[];win=0;loss=0;lastPred=null;
+  render();
+  resetPredict();
+}
+
+function recalcStats(){
+  win=dna.filter(x=>x==="√").length;
+  loss=dna.filter(x=>x==="×").length;
+}
+
+function render(){
+  const h=document.getElementById("history");
+  const d=document.getElementById("dna");
+  h.innerHTML=""; d.innerHTML="";
+
+  history.slice(-20).forEach(v=>{
+    let e=document.createElement("div");
+    e.className="dot "+v;
+    e.innerText=v;
+    h.appendChild(e);
+  });
+
+  dna.slice(-20).forEach(v=>{
+    let e=document.createElement("div");
+    e.className="dna-item "+(v==="√"?"ok":"bad");
+    e.innerText=v;
+    d.appendChild(e);
+  });
+
+  document.getElementById("win").innerText=win;
+  document.getElementById("loss").innerText=loss;
+  let t=win+loss;
+  document.getElementById("rate").innerText=t?Math.round(win/t*100)+"%":"0%";
+}
+
+function resetPredict(){
+  document.getElementById("pred").innerText="–";
+  document.getElementById("pred").className="big wait";
+  document.getElementById("confText").innerText="กรอกผลให้ครบ 10 ตา";
+  document.getElementById("confBar").style.width="0%";
+}
+
+function predict(){
+  if(history.length<10){
+    resetPredict();
+    return;
+  }
+
+  let recentDNA=dna.slice(-5);
+  let hot=recentDNA.filter(x=>x==="√").length;
+  let conf=70+hot*6;
+
+  let r=Math.random();
+  let p=r<0.5?"B":"P";
+  lastPred=p;
+
+  document.getElementById("pred").innerText=p;
+  document.getElementById("pred").className="big "+p;
+  document.getElementById("confText").innerText="CONFIDENCE "+conf+"%";
+  document.getElementById("confBar").style.width=conf+"%";
+}
+</script>
+
+</body>
+</html>
