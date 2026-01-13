@@ -1,1 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Chat Gpt Pro 5.1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<style>
+body{
+  margin:0;
+  font-family:Segoe UI,Arial;
+  background:#0b0b0f;
+  color:#e5e7eb;
+}
+
+/* ===== LOCK SCREEN ===== */
+#lockScreen{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+.lockBox{
+  width:300px;
+  padding:24px;
+  border-radius:16px;
+  border:2px solid #22c55e;
+  box-shadow:0 0 30px rgba(34,197,94,.5);
+  text-align:center;
+}
+.lockBox h2{
+  color:#22c55e;
+  margin-bottom:16px;
+}
+.lockBox input,
+.lockBox button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:10px;
+  border:1px solid #22c55e;
+  background:#000;
+  color:#22c55e;
+  font-weight:900;
+}
+.lockBox button{
+  background:#22c55e;
+  color:#000;
+  cursor:pointer;
+}
+#lockErr{
+  color:#ef4444;
+  margin-top:8px;
+  font-size:13px;
+}
+
+/* ===== APP ===== */
+.app{
+  max-width:420px;
+  margin:20px auto;
+  padding:20px;
+}
+.header{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:22px;
+  font-weight:900;
+  margin-bottom:14px;
+}
+.header .dot{
+  width:26px;height:26px;border-radius:50%;
+  border:4px solid #22c55e;
+}
+.history{
+  display:flex;
+  gap:6px;
+  margin-bottom:16px;
+  flex-wrap:wrap;
+}
+.h{
+  width:32px;height:32px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  background:#111;
+}
+.P{color:#22c55e}
+.B{color:#ef4444}
+
+.prediction{
+  border-radius:18px;
+  padding:24px;
+  text-align:center;
+  margin-bottom:14px;
+}
+.prediction.player{
+  background:linear-gradient(180deg,#16a34a,#064e3b);
+  box-shadow:0 0 30px rgba(34,197,94,.4);
+}
+.prediction.banker{
+  background:linear-gradient(180deg,#7f1d1d,#450a0a);
+  box-shadow:0 0 30px rgba(239,68,68,.4);
+}
+.prediction.wait{background:#111}
+.prediction .icon{font-size:34px}
+.prediction .text{font-size:28px;font-weight:900}
+.prediction .percent{font-size:22px}
+
+.dna{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:16px;
+}
+.win{color:#22c55e;font-weight:900}
+.lose{color:#ef4444;font-weight:900}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-bottom:16px;
+}
+.stat{
+  background:#111;
+  border-radius:12px;
+  padding:10px;
+  text-align:center;
+}
+.stat small{color:#9ca3af}
+.stat div{font-size:18px;font-weight:800}
+
+.buttons{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+.btn{
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  font-size:18px;
+  font-weight:900;
+}
+.player{background:#22c55e;color:#000}
+.banker{background:#ef4444;color:#fff}
+.undo{background:#374151;color:#fff}
+.reset{
+  grid-column:1/3;
+  background:#fbbf24;
+  color:#000;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOCK -->
+<div id="lockScreen">
+  <div class="lockBox">
+    <h2>🔐 SYSTEM ACCESS</h2>
+    <input id="lockPass" type="password" placeholder="ENTER CODE">
+    <button onclick="unlock()">LOGIN</button>
+    <div id="lockErr"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app">
+  <div class="header">
+    <div class="dot"></div>
+    Chat Gpt Pro 5.1
+  </div>
+
+  <div id="history" class="history"></div>
+
+  <div id="prediction" class="prediction wait">
+    <div id="icon" class="icon">🧠</div>
+    <div id="predText" class="text">WAIT</div>
+    <div id="predPct" class="percent"></div>
+  </div>
+
+  <div id="dna" class="dna"></div>
+
+  <div class="stats">
+    <div class="stat"><small>Inputs</small><div id="inputs">0</div></div>
+    <div class="stat"><small>W/L</small><div id="wl">0/0</div></div>
+    <div class="stat"><small>P/B</small><div id="pb">0/0</div></div>
+  </div>
+
+  <div class="buttons">
+    <button class="btn player" onclick="add('P')">PLAYER</button>
+    <button class="btn banker" onclick="add('B')">BANKER</button>
+    <button class="btn undo" onclick="undo()">UNDO</button>
+    <button class="btn reset" onclick="resetAll()">RESET</button>
+  </div>
+</div>
+
+<script>
+/* ===== LOCK LOGIC ===== */
+const ACCESS_CODE = "1688";
+function unlock(){
+  if(lockPass.value === ACCESS_CODE){
+    lockScreen.style.display = "none";
+  }else{
+    lockErr.textContent = "ACCESS DENIED";
+  }
+}
+
+/* ===== BACCARAT LOGIC ===== */
+let h=[], dna=[], pred=null, win=0, loss=0;
+
+function predict(){
+  if(h.length<3){
+    pred=null;
+    prediction.className='prediction wait';
+    predText.textContent='WAIT';
+    predPct.textContent='';
+    return;
+  }
+
+  let weightP=50, weightB=50;
+  let recent=h.slice(-5);
+  let p=recent.filter(x=>x==='P').length;
+  let b=recent.length-p;
+  weightP+=(p-b)*4;
+  if(Math.random()*100<weightP) pred='P'; else pred='B';
+
+  prediction.className='prediction '+(pred==='P'?'player':'banker');
+  predText.textContent=pred==='P'?'PLAYER':'BANKER';
+  predPct.textContent=(55+Math.random()*20).toFixed(1)+'%';
+}
+
+function add(x){
+  h.push(x);
+  if(pred){
+    x===pred?win++:loss++;
+    dna.push(x===pred?'√':'×');
+  }
+  render(); predict();
+}
+function undo(){
+  h.pop(); dna.pop();
+  win=0; loss=0;
+  dna.forEach(x=>x==='√'?win++:loss++);
+  render(); predict();
+}
+function resetAll(){
+  h=[]; dna=[]; win=0; loss=0; pred=null;
+  render(); predict();
+}
+function render(){
+  history.innerHTML=''; dnaBox.innerHTML='';
+  h.forEach(x=>{
+    let e=document.createElement('div');
+    e.className='h '+x; e.textContent=x;
+    history.appendChild(e);
+  });
+  dna.forEach(x=>{
+    let e=document.createElement('div');
+    e.className=x==='√'?'win':'lose';
+    e.textContent=x;
+    dnaBox.appendChild(e);
+  });
+  inputs.textContent=h.length+'/70';
+  wl.textContent=win+'/'+loss;
+  pb.textContent=h.filter(x=>x==='P').length+'/'+h.filter(x=>x==='B').length;
+}
+
+const history=document.getElementById('history');
+const dnaBox=document.getElementById('dna');
+const predText=document.getElementById('predText');
+const predPct=document.getElementById('predPct');
+const prediction=document.getElementById('prediction');
+const inputs=document.getElementById('inputs');
+const wl=document.getElementById('wl');
+const pb=document.getElementById('pb');
+</script>
+
+</body>
+</html>
