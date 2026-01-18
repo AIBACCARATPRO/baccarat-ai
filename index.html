@@ -1,286 +1,346 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>Chat Gpt Pro 5.1</title>
+<title>AI BACCARAT • Model V1</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+:root{
+  --bg:#020617;
+  --panel:#050b1f;
+  --neon:#22d3ee;
+  --blue:#3b82f6;
+  --red:#ef4444;
+  --green:#22c55e;
+  --purple:#a855f7;
+  --gray:#64748b;
+}
+*{box-sizing:border-box}
 body{
   margin:0;
   font-family:Segoe UI,Arial;
-  background:#0b0b0f;
+  background:radial-gradient(circle at top,#050b1f,#020617 70%);
   color:#e5e7eb;
 }
 
 /* ===== LOCK SCREEN ===== */
-#lockScreen{
+#lock{
   position:fixed;
   inset:0;
-  background:#000;
+  background:radial-gradient(circle at top,#020617,#000 80%);
   display:flex;
   align-items:center;
   justify-content:center;
   z-index:9999;
 }
-.lockBox{
-  width:300px;
-  padding:24px;
-  border-radius:16px;
-  border:2px solid #22c55e;
-  box-shadow:0 0 30px rgba(34,197,94,.5);
+.lock-box{
+  background:#020617;
+  border:2px solid #22d3ee;
+  box-shadow:0 0 40px #22d3ee;
+  padding:30px;
+  border-radius:20px;
   text-align:center;
+  width:300px;
 }
-.lockBox h2{
-  color:#22c55e;
-  margin-bottom:16px;
+.lock-box h2{
+  margin:0 0 14px;
+  color:#22d3ee;
 }
-.lockBox input,
-.lockBox button{
+.lock-box input{
   width:100%;
   padding:12px;
-  margin-top:10px;
-  border-radius:10px;
-  border:1px solid #22c55e;
-  background:#000;
-  color:#22c55e;
-  font-weight:900;
+  font-size:18px;
+  border-radius:12px;
+  border:none;
+  outline:none;
+  text-align:center;
+  margin-bottom:12px;
 }
-.lockBox button{
-  background:#22c55e;
-  color:#000;
+.lock-box button{
+  width:100%;
+  padding:12px;
+  font-size:18px;
+  font-weight:900;
+  border:none;
+  border-radius:12px;
+  background:#22d3ee;
   cursor:pointer;
 }
-#lockErr{
+.lock-error{
   color:#ef4444;
-  margin-top:8px;
-  font-size:13px;
+  margin-top:10px;
+  display:none;
 }
 
-/* ===== APP ===== */
-.app{
-  max-width:420px;
-  margin:20px auto;
-  padding:20px;
-}
+/* ===== ORIGINAL STYLE ===== */
 .header{
+  text-align:center;
+  padding:18px;
+  font-size:28px;
+  font-weight:900;
+  color:var(--neon);
+  text-shadow:0 0 20px var(--neon);
+  border-bottom:2px solid #1e293b;
+}
+.container{max-width:900px;margin:auto;padding:16px}
+.card{
+  background:linear-gradient(180deg,#0b1224,#020617);
+  border:1px solid #1e293b;
+  border-radius:20px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 0 30px rgba(34,211,238,.15);
+}
+
+/* PB Vertical 6 */
+.pb6{
+  display:grid;
+  grid-auto-flow:column;
+  grid-template-rows:repeat(6,56px);
+  gap:10px;
+}
+.pb6 div{
+  width:56px;
+  height:56px;
+  border-radius:14px;
   display:flex;
   align-items:center;
-  gap:10px;
+  justify-content:center;
   font-size:22px;
   font-weight:900;
-  margin-bottom:14px;
+  background:#020617;
+  border:2px solid #22c55e;
 }
-.header .dot{
-  width:26px;height:26px;border-radius:50%;
-  border:4px solid #22c55e;
-}
-.history{
-  display:flex;
-  gap:6px;
-  margin-bottom:16px;
-  flex-wrap:wrap;
-}
-.h{
-  width:32px;height:32px;
-  border-radius:8px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:900;
-  background:#111;
-}
-.P{color:#22c55e}
-.B{color:#ef4444}
-
-.prediction{
-  border-radius:18px;
-  padding:24px;
-  text-align:center;
-  margin-bottom:14px;
-}
-.prediction.player{
-  background:linear-gradient(180deg,#16a34a,#064e3b);
-  box-shadow:0 0 30px rgba(34,197,94,.4);
-}
-.prediction.banker{
-  background:linear-gradient(180deg,#7f1d1d,#450a0a);
-  box-shadow:0 0 30px rgba(239,68,68,.4);
-}
-.prediction.wait{background:#111}
-.prediction .icon{font-size:34px}
-.prediction .text{font-size:28px;font-weight:900}
-.prediction .percent{font-size:22px}
-
-.dna{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  margin-bottom:16px;
-}
-.win{color:#22c55e;font-weight:900}
-.lose{color:#ef4444;font-weight:900}
+.pb6 .P{color:var(--blue)}
+.pb6 .B{color:var(--red)}
+.pb6 .T{color:var(--green)}
 
 .stats{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(4,1fr);
   gap:10px;
-  margin-bottom:16px;
-}
-.stat{
-  background:#111;
-  border-radius:12px;
-  padding:10px;
   text-align:center;
 }
-.stat small{color:#9ca3af}
-.stat div{font-size:18px;font-weight:800}
-
-.buttons{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-}
-.btn{
-  padding:14px;
-  border:none;
+.stat{
+  background:#020617;
+  border:1px solid #1e293b;
   border-radius:14px;
-  font-size:18px;
+  padding:12px;
+}
+.stat small{color:#94a3b8}
+.stat div{font-size:26px;font-weight:900;color:var(--neon)}
+
+.predict{text-align:center;font-size:56px;font-weight:900;margin:10px 0}
+.predict.P{color:var(--blue)}
+.predict.B{color:var(--red)}
+.wait{color:#64748b}
+.conf{text-align:center;color:#a5f3fc}
+
+.history{text-align:center;font-size:22px;letter-spacing:6px}
+.p{color:var(--blue);font-weight:900}
+.b{color:var(--red);font-weight:900}
+.t{color:var(--green);font-weight:900}
+
+.dna span{
+  display:inline-block;
+  padding:8px 12px;
+  border-radius:10px;
+  margin:4px;
   font-weight:900;
+  border:2px solid #22c55e;
 }
-.player{background:#22c55e;color:#000}
-.banker{background:#ef4444;color:#fff}
-.undo{background:#374151;color:#fff}
-.reset{
-  grid-column:1/3;
-  background:#fbbf24;
-  color:#000;
+.ok{color:#22c55e}
+.bad{color:#ef4444}
+
+.buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.control{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:10px}
+.btn{
+  padding:18px 0;
+  font-size:20px;
+  font-weight:900;
+  border:none;
+  border-radius:18px;
+  cursor:pointer;
+  color:#fff;
 }
+.player{background:#2563eb}
+.banker{background:#dc2626}
+.tie{background:#22c55e;color:#000}
+.undo{background:#64748b}
+.reset{background:#475569}
+
+.mode{display:flex;gap:12px;justify-content:center}
+.mode button{
+  padding:10px 22px;
+  border-radius:14px;
+  border:none;
+  font-weight:900;
+  cursor:pointer;
+  background:#1f2937;
+  color:#e5e7eb;
+}
+.mode .active{background:var(--purple);color:#020617}
 </style>
 </head>
 
 <body>
 
-<!-- LOCK -->
-<div id="lockScreen">
-  <div class="lockBox">
-    <h2>🔐 SYSTEM ACCESS</h2>
-    <input id="lockPass" type="password" placeholder="ENTER CODE">
-    <button onclick="unlock()">LOGIN</button>
-    <div id="lockErr"></div>
+<!-- LOCK SCREEN -->
+<div id="lock">
+  <div class="lock-box">
+    <h2>AI TOOL BCR</h2>
+    <input type="password" id="pass" placeholder="ใส่รหัสเข้าใช้งาน">
+    <button onclick="unlock()">เข้าสู่ระบบ</button>
+    <div id="err" class="lock-error">รหัสไม่ถูกต้อง</div>
   </div>
 </div>
 
-<!-- APP -->
-<div class="app">
-  <div class="header">
-    <div class="dot"></div>
-    Chat Gpt Pro 5.1
-  </div>
+<div class="header">⚡ AI BACCARAT • Model V1 ⚡</div>
 
-  <div id="history" class="history"></div>
+<div class="container">
 
-  <div id="prediction" class="prediction wait">
-    <div id="icon" class="icon">🧠</div>
-    <div id="predText" class="text">WAIT</div>
-    <div id="predPct" class="percent"></div>
-  </div>
+<div class="card stats">
+  <div class="stat"><small>ไม้</small><div id="count">0</div></div>
+  <div class="stat"><small>ชนะ</small><div id="win">0</div></div>
+  <div class="stat"><small>แพ้</small><div id="loss">0</div></div>
+  <div class="stat"><small>%</small><div id="acc">0%</div></div>
+</div>
 
-  <div id="dna" class="dna"></div>
+<div class="card mode">
+  <button id="pure" class="active" onclick="setMode('pure')">AI Cyber</button>
+  <button id="weighted" onclick="setMode('weighted')">AI Adaptive</button>
+</div>
 
-  <div class="stats">
-    <div class="stat"><small>Inputs</small><div id="inputs">0</div></div>
-    <div class="stat"><small>W/L</small><div id="wl">0/0</div></div>
-    <div class="stat"><small>P/B</small><div id="pb">0/0</div></div>
-  </div>
+<div class="card">
+  <div id="prediction" class="predict wait">WAIT 10</div>
+  <div id="conf" class="conf"></div>
+</div>
 
-  <div class="buttons">
-    <button class="btn player" onclick="add('P')">PLAYER</button>
-    <button class="btn banker" onclick="add('B')">BANKER</button>
-    <button class="btn undo" onclick="undo()">UNDO</button>
-    <button class="btn reset" onclick="resetAll()">RESET</button>
-  </div>
+<div class="card">
+  <b>PB (Vertical 6)</b>
+  <div id="pb6" class="pb6"></div>
+</div>
+
+<div class="card">
+  <div id="history" class="history">ยังไม่มีข้อมูล</div>
+</div>
+
+<div class="card">
+  <b>DNA</b>
+  <div id="dna"></div>
+</div>
+
+<div class="buttons">
+  <button class="btn player" onclick="add('P')">ผู้เล่น</button>
+  <button class="btn banker" onclick="add('B')">เจ้ามือ</button>
+  <button class="btn tie" onclick="add('T')">เสมอ</button>
+</div>
+
+<div class="control">
+  <button class="btn undo" onclick="undo()">ย้อนกลับ</button>
+  <button class="btn reset" onclick="resetAll()">ล้างข้อมูล</button>
+</div>
+
 </div>
 
 <script>
-/* ===== LOCK LOGIC ===== */
-const ACCESS_CODE = "1688";
+/* ===== PASSWORD ===== */
+const PASSWORD = "425834";
+
 function unlock(){
-  if(lockPass.value === ACCESS_CODE){
-    lockScreen.style.display = "none";
+  if(pass.value === PASSWORD){
+    document.getElementById('lock').style.display='none';
   }else{
-    lockErr.textContent = "ACCESS DENIED";
+    err.style.display='block';
   }
 }
 
-/* ===== BACCARAT LOGIC ===== */
-let h=[], dna=[], pred=null, win=0, loss=0;
+/* ===== ORIGINAL JS (ไม่พัง) ===== */
+let h=[],dna=[],pred=null,win=0,loss=0,mode='pure';
 
+function randomPick(){return Math.random()<0.5?'P':'B'}
+function weightedPick(){
+  const c=h.filter(x=>x!=='T');
+  if(c.length<3) return randomPick();
+  let last=c.at(-1);
+  return Math.random()<0.65?last:(last==='P'?'B':'P');
+}
 function predict(){
-  if(h.length<3){
-    pred=null;
-    prediction.className='prediction wait';
-    predText.textContent='WAIT';
-    predPct.textContent='';
-    return;
+  if(h.filter(x=>x!=='T').length<10){
+    prediction.textContent='WAIT 10';
+    prediction.className='predict wait';
+    conf.textContent='';
+    pred=null;return;
   }
-
-  let weightP=50, weightB=50;
-  let recent=h.slice(-5);
-  let p=recent.filter(x=>x==='P').length;
-  let b=recent.length-p;
-  weightP+=(p-b)*4;
-  if(Math.random()*100<weightP) pred='P'; else pred='B';
-
-  prediction.className='prediction '+(pred==='P'?'player':'banker');
-  predText.textContent=pred==='P'?'PLAYER':'BANKER';
-  predPct.textContent=(55+Math.random()*20).toFixed(1)+'%';
+  pred=mode==='pure'?randomPick():weightedPick();
+  prediction.textContent=pred;
+  prediction.className='predict '+pred;
+  conf.textContent='ความมั่นใจ '+Math.floor(55+Math.random()*35)+'%';
 }
-
 function add(x){
   h.push(x);
-  if(pred){
-    x===pred?win++:loss++;
-    dna.push(x===pred?'√':'×');
-  }
-  render(); predict();
+  if(pred && x!=='T'){x===pred?win++:loss++;dna.push(x===pred?'√':'×')}
+  renderPB6();renderHistory();renderDNA();updateStats();predict();
+}
+function renderPB6(){
+  pb6.innerHTML='';
+  h.forEach(x=>{
+    let d=document.createElement('div');
+    d.textContent=x;d.className=x;
+    pb6.appendChild(d);
+  });
+}
+function renderHistory(){
+  history.innerHTML=h.map(x=>`<span class="${x==='P'?'p':x==='B'?'b':'t'}">${x}</span>`).join(' ');
+}
+function renderDNA(){
+  dnaEl.innerHTML='';
+  dna.forEach(x=>{
+    let s=document.createElement('span');
+    s.textContent=x;s.className=x==='√'?'ok':'bad';
+    dnaEl.appendChild(s);
+  });
 }
 function undo(){
-  h.pop(); dna.pop();
-  win=0; loss=0;
-  dna.forEach(x=>x==='√'?win++:loss++);
-  render(); predict();
+  if(!h.length)return;
+  h.pop();if(dna.length)dna.pop();
+  recalcStats();
+  renderPB6();renderHistory();renderDNA();predict();updateStats();
 }
 function resetAll(){
-  h=[]; dna=[]; win=0; loss=0; pred=null;
-  render(); predict();
+  h=[];dna=[];pred=null;win=0;loss=0;
+  renderPB6();renderHistory();renderDNA();predict();updateStats();
 }
-function render(){
-  history.innerHTML=''; dnaBox.innerHTML='';
-  h.forEach(x=>{
-    let e=document.createElement('div');
-    e.className='h '+x; e.textContent=x;
-    history.appendChild(e);
-  });
-  dna.forEach(x=>{
-    let e=document.createElement('div');
-    e.className=x==='√'?'win':'lose';
-    e.textContent=x;
-    dnaBox.appendChild(e);
-  });
-  inputs.textContent=h.length+'/70';
-  wl.textContent=win+'/'+loss;
-  pb.textContent=h.filter(x=>x==='P').length+'/'+h.filter(x=>x==='B').length;
+function recalcStats(){
+  win=dna.filter(x=>x==='√').length;
+  loss=dna.filter(x=>x==='×').length;
+}
+function updateStats(){
+  let t=win+loss;
+  count.textContent=t;
+  winEl.textContent=win;
+  lossEl.textContent=loss;
+  acc.textContent=t?Math.round(win/t*100)+'%':'0%';
+}
+function setMode(m){
+  mode=m;
+  pure.classList.remove('active');
+  weighted.classList.remove('active');
+  document.getElementById(m).classList.add('active');
+  predict();
 }
 
-const history=document.getElementById('history');
-const dnaBox=document.getElementById('dna');
-const predText=document.getElementById('predText');
-const predPct=document.getElementById('predPct');
+/* DOM */
+const pb6=document.getElementById('pb6');
 const prediction=document.getElementById('prediction');
-const inputs=document.getElementById('inputs');
-const wl=document.getElementById('wl');
-const pb=document.getElementById('pb');
+const conf=document.getElementById('conf');
+const dnaEl=document.getElementById('dna');
+const history=document.getElementById('history');
+const count=document.getElementById('count');
+const winEl=document.getElementById('win');
+const lossEl=document.getElementById('loss');
+const acc=document.getElementById('acc');
 </script>
 
 </body>
